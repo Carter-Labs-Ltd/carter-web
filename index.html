@@ -57,6 +57,8 @@
         <script>
             const output = document.getElementById("output");
             const recordButton = document.getElementById("recordButton");
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiKey = urlParams.get("key");
 
             let recording = false;
             let myvad = null;
@@ -82,7 +84,7 @@
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify({
                                 audio: base64,
-                                key: "MY API KEY", //this is a test key, please use your own and treat it as a password
+                                key: apiKey,
                                 playerId: "PLAYER1",
                             }),
                         })
