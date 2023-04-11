@@ -4,20 +4,18 @@
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Web-Speech-Socket-Base</title>
+        <title>Carter Web</title>
 
         <link
             href="https://fonts.googleapis.com/css2?family=Exo:wght@400;500;600;700&display=swap"
             rel="stylesheet"
         />
-        <script src="https://cdn.socket.io/4.1.2/socket.io.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/ort.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@ricky0123/vad/dist/index.browser.js"></script>
         <style>
             body {
                 font-family: sans-serif;
                 font-family: "Exo", sans-serif;
-
                 background: #070815;
                 color: white;
             }
@@ -25,13 +23,15 @@
                 text-align: center;
                 font-weight: lighter;
             }
-            button {
+            #recordButton {
                 display: block;
-                margin: 0 auto;
+                margin: 20px auto;
                 padding: 10px 20px;
                 font-size: 1.2rem;
                 border: none;
                 border-radius: 5px;
+                background-color: #4caf50;
+                color: white;
                 cursor: pointer;
             }
             textarea {
@@ -51,45 +51,67 @@
         </style>
     </head>
     <body>
-        <h1>Web Whisper</h1>
-        <p id="status"></p>
-        <textarea id="output"></textarea>
-    </body>
+        <h1>Carter Web</h1>
+        <button id="recordButton">Start Recording</button>
+        <p id="output"></p>
+        <script>
+            const output = document.getElementById("output");
+            const recordButton = document.getElementById("recordButton");
 
-    <script>
-        const output = document.getElementById("output");
-        const status = document.getElementById("status");
+            let recording = false;
+            let myvad = null;
 
-        async function main() {
-            const socket = io();
-
-            socket.on("connect", async () => {
-                const myvad = await vad.MicVAD.new({
+            async function main() {
+                myvad = await vad.MicVAD.new({
                     positiveSpeechThreshold: 0.8,
                     negativeSpeechThreshold: 0.8 - 0.15,
                     minSpeechFrames: 1,
                     preSpeechPadFrames: 1,
                     redemptionFrames: 2,
                     onSpeechStart: () => {
-                        console.log("Speech start detected");
-                        status.innerText = "Listening...";
+                        recordButton.innerText = "Listening...";
                     },
                     onSpeechEnd: (audio) => {
-                        status.innerText = "Processing...";
+                        myvad.pause();
+                        recordButton.innerText = "Processing...";
                         const wavBuffer = vad.utils.encodeWAV(audio);
                         const base64 = vad.utils.arrayBufferToBase64(wavBuffer);
-                        socket.emit("audio_data", base64);
+
+                        fetch("https://api.carterlabs.ai/chat", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                audio: base64,
+                                key: "MY API KEY", //this is a test key, please use your own and treat it as a password
+                                playerId: "PLAYER1",
+                            }),
+                        })
+                            .then((response) => response.json())
+                            .then((data) => {
+                                status.innerText = "";
+                                output.innerText = data.output.text;
+                                recordButton.innerText = "Start Recording";
+                            })
+                            .catch((error) => {
+                                console.error(error);
+                            });
                     },
                 });
-                myvad.start();
+            }
+
+            recordButton.addEventListener("click", () => {
+                if (!recording) {
+                    recording = true;
+                    recordButton.innerText = "Stop Recording";
+                    myvad.start();
+                } else {
+                    recording = false;
+                    recordButton.innerText = "Start Recording";
+                    myvad.pause();
+                }
             });
-            socket.on("transcription", (data) => {
-                status.innerText = "";
-                output.value = (output.value + data)
-                    .replace(".", " ")
-                    .replace("  ", " ");
-            });
-        }
-        main();
-    </script>
+
+            main();
+        </script>
+    </body>
 </html>
