@@ -1,0 +1,79 @@
+body {
+    font-family: sans-serif;
+    font-family: "Exo", sans-serif;
+    background: #070815;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+
+    background-image: radial-gradient(#ffffff17 1px, transparent 0),
+        linear-gradient(187deg, #070815 0%, #0c0310 100%);
+    background-size: 40px 40px, 100% 100%;
+    background-position: -19px -19px, 0 0;
+}
+
+#recordButton {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    background-color: #0084ff;
+    box-shadow: 0 0 30px blue;
+    color: white;
+    cursor: pointer;
+    font-family: "Exo", sans-serif;
+}
+
+.typewriter {
+    width: fit-content;
+}
+
+.typewriter-text {
+    width: fit-content;
+    max-width: 600px;
+    color: #fff;
+    margin: auto;
+    overflow: hidden;
+    text-align: center;
+    border-right: 0.15em solid #fff;
+    white-space: nowrap;
+    font-weight: lighter;
+    font-size: 1.3rem;
+    animation: typing 1s steps(15, end), blink-caret 0.75s step-end infinite,
+        hide-caret 1s 1 forwards;
+}
+
+@keyframes typing {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes blink-caret {
+    0%,
+    100% {
+        border-color: transparent;
+    }
+    50% {
+        border-color: #fff;
+    }
+}
+
+@keyframes hide-caret {
+    0%,
+    99% {
+        border-color: inherit;
+    }
+    100% {
+        border-color: transparent;
+    }
+}

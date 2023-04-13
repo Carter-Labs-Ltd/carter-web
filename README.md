@@ -11,3 +11,7 @@ This project combines a few really awesome open source projects to bring state-o
 ## Sign Up to our early access program and configure your character!
 
 https://carterlabs.ai
+
+## Run locally
+
+`python -m http.server`
