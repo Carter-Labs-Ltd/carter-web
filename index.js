@@ -37,18 +37,6 @@ document.addEventListener("DOMContentLoaded", function (event) {
         speak(stalls[Math.floor(Math.random() * stalls.length)]);
     }
 
-    function speakOutputText(outputText) {
-        if (outputText.split(" ").length > 5) {
-            var firstSentence = outputText.split(/[.!?]/)[0] + ".";
-            speak(firstSentence);
-
-            var restOfText = outputText.substring(firstSentence.length).trim();
-            setTimeout(function () {
-                speak(restOfText);
-            }, firstSentence.split(" ").length * 160);
-        }
-    }
-
     function postDataToAPI(audio) {
         const wavBuffer = vad.utils.encodeWAV(audio);
         const base64 = vad.utils.arrayBufferToBase64(wavBuffer);
@@ -72,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function (event) {
                 const maxLength = 50;
                 const lines = splitText(outputText, maxLength);
                 addLinesSequentially(lines, animationDuration);
-                speakOutputText(outputText);
+                speak(data.output.audio);
             })
             .catch((error) => {
                 console.error(error);
@@ -120,22 +108,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
         return lines;
     }
 
-    function speak(toSay) {
-        toSay = encodeURIComponent(toSay);
-        toSay.replace(".", "%2E");
-
-        fetch("https://api.carterlabs.ai/speak/female/" + toSay + "/" + apiKey)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log(data.file_url);
-
-                // play audio from url
-                const audio = new Audio(data.file_url);
-                audio.play();
-            })
-            .catch((error) => {
-                console.error(error);
-            });
+    function speak(url) {
+        const audio = new Audio(url);
+        audio.play();
     }
 
     async function main() {
@@ -160,15 +135,9 @@ document.addEventListener("DOMContentLoaded", function (event) {
         });
     }
     recordButton.addEventListener("click", () => {
-        if (!recording) {
-            recording = true;
-            recordButton.innerText = "Listening...";
-            myvad.start();
-        } else {
-            recording = false;
-            recordButton.innerText = "Start Listening";
-            myvad.pause();
-        }
+        recording = true;
+        recordButton.innerText = "Listening...";
+        myvad.start();
     });
     main();
 });
